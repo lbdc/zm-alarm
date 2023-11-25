@@ -26,7 +26,8 @@ import cv2
 # ZM configured for local http port 80 access
 # ZM Auth enabled
 # ZM API enabled
-#   
+# Ensure "movflags=faststart" is NOT enabled in camera storage
+#
 # Additional packages:
 # apt get python3-mysqldb python3-numpy python3-opencv
 # apt get mailutils (mail must be setup to use emails)
@@ -71,7 +72,7 @@ use_box = 0 # use 1 or 0
 words_list = ["person", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe"]
 thresh = 0.70 # threshold detection 0 to 1
 #
-# When saving detection to file, use bounding box or not
+# Don't change this
 use_opencv = 1 # Leave this to 1
 
 # Set a delay in seconds in case too many alarms (default 1s)
