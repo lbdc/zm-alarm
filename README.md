@@ -17,6 +17,7 @@ apt get python3-mysqldb python3-numpy python3-opencv
 apt get mailutils 
 
 * mail must be setup to use emails
+
 Download files for YOLO4: coco.names, yolov4.cfg, yolov4.weights
 
  
