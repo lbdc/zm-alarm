@@ -8,6 +8,8 @@ ZM configured for localhost http port 80 access
 ZM Auth enabled
 
 ZM API enabled
+
+Ensure "movflags=faststart" is NOT enabled in camera storage
    
 Additional packages:
 apt get python3-mysqldb python3-numpy python3-opencv
