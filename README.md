@@ -20,4 +20,4 @@ e.g. python3 /home/user/zm-alarm_02.py
 
 The script can either email or store to a folder of your choice a JPG of the object detected.
 
-![alt text](https://github.com/lbdc/zm-alarm/main/Screenshot.png?raw=true)
+![Screenshot](Screenshot.png)
