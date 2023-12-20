@@ -20,8 +20,6 @@ apt get mailutils
 
 Download files for YOLO4: coco.names, yolov4.cfg, yolov4.weights
 
- 
-Usage:$token_json = shell_exec('curl -k -XPOST -d "user=admin&pass=password" https://localhost/zm/api/host/login.json');
 After updating settings (lines 38 to 86 in script), simply start the python script
 
 Recommend to run script as normal user in home folder to simplify permissions.
@@ -31,7 +29,7 @@ e.g. python3 /home/user/zm-alarm_02.py
 The script can either email or store to a folder of your choice a JPG of the object detected.
 
 
-![Screenshot](Screenshot1.png)
+![Screenshot](Screenshot1.png) ![Screenshot](Screenshot1a.png)
 
 # zm_streams
 Zoneminder camera montage displays streams at 1 fps. No limits on number of cameras.
