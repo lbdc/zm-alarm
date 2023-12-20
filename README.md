@@ -29,7 +29,7 @@ e.g. python3 /home/user/zm-alarm_02.py
 The script can either email or store to a folder of your choice a JPG of the object detected.
 
 
-![Screenshot](Screenshot1.png) ![Screenshot](Screenshot1a.png)
+![Screenshot](Screenshot1.png) ![Screenshot](Screenshot1a.jpg)
 
 # zm_streams
 Zoneminder camera montage displays streams at 1 fps. No limits on number of cameras.
