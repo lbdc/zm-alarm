@@ -50,6 +50,6 @@ Ensure the file /etc/zm.conf is readable by the web server (e.g. owner or group:
 
 Load page from your web browser
 
-![Screenshot](Screenshot.png)
+![Screenshot](Screenshot2.jpg)
 
 NOTE: I am not a programmer and the scripts do not follow any standards.
