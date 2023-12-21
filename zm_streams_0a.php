@@ -185,17 +185,27 @@ function Load_Camera()
 // Function to check and display the state of a button
 function toggleButtonState(buttonId) {
 	var button = document.getElementById(buttonId);
-	  var gridItems = document.getElementById("grid_" + buttonId);
+	var gridItems = document.getElementById("grid_" + buttonId);
 	if (button.value == "on") {
 		button.classList.add('myButtonClicked');
 		button.value = "off";
 		gridItems.style.display = "none"; // Hide the div
-		camera[buttonId]["Value"] = "off";
+		for (var i = 0; i < camera.length; i++) {
+			if (camera[i].Id === buttonId) {
+				camera[i].Value = "off";
+				break; // Once the update is done, exit the loop
+			}
+		}
 	} else {
 		button.classList.remove('myButtonClicked');
 		button.value = "on";
-		camera[buttonId]["Value"] = "on";
 		gridItems.style.display = "block"; // Show the div
+		for (var i = 0; i < camera.length; i++) {
+			if (camera[i].Id === buttonId) {
+				camera[i].Value = "on";
+				break; // Once the update is done, exit the loop
+			}
+		}
 	}
 }
 function resizeGrid(action) {
