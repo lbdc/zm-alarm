@@ -73,6 +73,7 @@ function Load_Camera()
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta http-equiv="refresh" content="300">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style>
 		.picture-grid {
@@ -141,28 +142,25 @@ function Load_Camera()
 		transition: opacity 0.3s ease-in-out;
 	}
 	
-	
 	.non-draggable {
     opacity: 0.1; /* Example: reduce opacity for non-draggable buttons */
     cursor: not-allowed !important; /* Example: change cursor to indicate non-draggable state */
     /* Add any other styling as needed */
 }
-	
-	
-	
+
 	</style>
 	<title>ZM Montage</title>
 </head>
 <body>
 	<!-- Containers to hold the top row buttons -->
 	<div id="buttonLayout"></div>
-	<button id="minus" class="myButton" onclick="resizeGrid('minus')">-</button><button id="plus" class="myButton" onclick="resizeGrid('plus')">+</button>
+		<button id="minus" class="myButton" onclick="resizeGrid('minus')">-</button><button id="size" class="myButton">Size:400</button><button id="plus" class="myButton" onclick="resizeGrid('plus')">+</button>
+		<button id="scaledown" class="myButton" onclick="scaleimg('scaledown')">-</button><button id="scalenum" class="myButton">Scale:50%</button><button id="scaleup" class="myButton" onclick="scaleimg('scaleup')">+</button>
+		<button id="save" class="myButton" onclick="saveToCookie()">save</button><button id="load" class="myButton" onclick="getFromCookie()">load</button>
 	<div id="buttonContainer"></div>
-	
 	<!-- Container to hold the camera images -->
 	<div class="picture-grid" id="pictureGrid"></div>
 	<!-- Images will be added dynamically using JavaScript -->
-
 <script>   
 	//
 	// Initialize variables from zoneminder to load cameras from zm database
@@ -170,13 +168,16 @@ function Load_Camera()
 	var token="<?php echo $token["access_token"]; ?>";
 	var camera =<?php echo json_encode($camera); ?>;
 	const pictureGrid = document.getElementById('pictureGrid'); // this doesnt seem required here
-	let size = 600; // Initial size
+	let size = 400; // Initial size
+	let scale = 50; // Initial scale
 	// Get the container element
 	var buttonContainer = document.getElementById("buttonContainer");
 	// Call createButton() to create button grid
 	createButton();
 	// Call createGrid() initially to create the img grid
 	createGrid();
+	// Load last page saved on open
+	getFromCookie();
 	// Set up a timer to update the images every 1 seconds (adjust as needed)
 	setInterval(updateImageSrc, 1000);
 //
@@ -203,6 +204,7 @@ function toggleButtonState(buttonId) {
 		for (var i = 0; i < camera.length; i++) {
 			if (camera[i].Id === buttonId) {
 				camera[i].Value = "on";
+				updateImageSrc();
 				break; // Once the update is done, exit the loop
 			}
 		}
@@ -215,18 +217,33 @@ function resizeGrid(action) {
 		size=size-100;
 	}
 	const gridContainer = document.getElementById('pictureGrid');
+	const buttonSize = document.getElementById('size');
+	buttonSize.innerHTML = "Size:" + size;
 	gridContainer.style.gridTemplateColumns = `repeat(auto-fill, minmax(${size}px, 1fr))`;
+}
+function scaleimg(action) {
+	if (action === 'scaledown') {
+		scale = Math.max(scale - 10, 0); 
+	} else if (action === 'scaleup') {
+		scale = Math.min(scale + 10, 100); 
+	}
+	// Update the text of the middle button with the current value
+	document.getElementById('scalenum').innerHTML = "Scale:" + scale + "%";
 }
 // Function to populate the buttons
 // Loop through the array and create buttons for each camera
 function createButton() {
-	document.addEventListener("DOMContentLoaded", function () {
+//	document.addEventListener("DOMContentLoaded", function () {
 		const buttonContainer = document.getElementById("buttonContainer");
+		buttonContainer.innerHTML = '';
 		for (var i = 0; i < camera.length; i++) {
 			// Create a new button element
 			var button = document.createElement("button");
 			button.id = camera[i]["Id"];
 			button.classList.add("myButton", "draggable");
+			if(camera[i]["Value"] == "off") {
+				button.classList.add("myButton", "draggable", "myButtonClicked");	
+			}
 			button.setAttribute("value", camera[i]["Value"]);
 			// Set the button text using array values
 			button.textContent = camera[i]['Name'];
@@ -248,10 +265,8 @@ function createButton() {
 			if (this.value === "off") {
 				e.preventDefault(); // Prevent drag if the button is clicked
 				alert("Hidden buttons cannot be moved");
-				
 				return;
 			}
-
 			dragSrcEl = this;
 			e.dataTransfer.effectAllowed = "move";
 			e.dataTransfer.setData("text/html", this.innerHTML);
@@ -269,8 +284,6 @@ function createButton() {
 				this.classList.add("drop-target");
 				this.classList.remove("non-draggable");
 			}
-			
-			
 			e.dataTransfer.dropEffect = "move";
 			return false;
 		}
@@ -288,16 +301,12 @@ function createButton() {
 			if (e.stopPropagation) {
 				e.stopPropagation();
 			}
-			
 			// Check if the target button has been clicked
 			if (this.value === "off") {
 				return;
 			}
-			
 			if (dragSrcEl !== this) {
-			
-			 // Save the target element's class before swapping
-//        const targetElementClass = this.className;
+			// Save the target element's class before swapping
 				dragSrcEl.innerHTML = this.innerHTML;
 				this.innerHTML = e.dataTransfer.getData("text/html");
 				const dragSrcId = dragSrcEl.id;
@@ -315,12 +324,13 @@ function createButton() {
 				reorderGrid();
 			});
 		}
-	});
+//	});
 }
 // Function to create the grid
 function createGrid() {
 	// Clear existing grid items
 	pictureGrid.innerHTML = '';
+	pictureGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${size}px, 1fr))`;
 	// Loop to create grid items with images
 	for (let i = 0; i < camera.length; i++) {
 		// Create a div element for each grid item
@@ -328,6 +338,9 @@ function createGrid() {
 		gridItem.className = 'grid-item';
 		gridItem.id = 'grid_' + camera[i]["Id"];
 		const img = document.createElement('img');
+		if(camera[i]["Value"] == "off") {
+			gridItem.style.display = "none"; // Hide the div
+		}
 		img.src = "";
 		img.alt = camera[i].Name;
 		img.id = "img_" + camera[i]["Id"];
@@ -382,15 +395,20 @@ function updateImageSrc() {
 	// Get all existing img elements in the pictureGrid
 	const imgElements = pictureGrid.querySelectorAll('.grid-item img');
 	for (let i = 0; i < camera.length; i++) {
-		camera[i].Source = "https://" + location.host + "/zm/cgi-bin/nph-zms?mode=single&scale=100&monitor=" + camera[i]["Id"] + "&token=" + token + "&" + Math.random();
-		imgElements[i].src = camera[i].Source;
+		if(camera[i].Value == "on") {
+			camera[i].Source = "https://" + location.host + "/zm/cgi-bin/nph-zms?mode=single&scale=" + scale + "&monitor=" + camera[i]["Id"] + "&token=" + token + "&" + Math.random();
+			imgElements[i].src = camera[i].Source;
+		} else {
+			camera[i].Source = "";
+			imgElements[i].src = camera[i].Source;
+		}
 	}
 }
-function openNewWindow(id) {
-index = camera.findIndex(obj => obj["Id"] === id);
-	url = "https://" + location.host + "/zm/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=1&buffer=1000&monitor=" + camera[index]["Id"] + "&token=" + token;
-	window.open(url, '_blank', 'width=600,height=400');
-}
+//function openNewWindow(id) {
+//index = camera.findIndex(obj => obj["Id"] === id);
+//	url = "https://" + location.host + "/zm/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=1&buffer=1000&monitor=" + camera[index]["Id"] + "&token=" + token;
+//	window.open(url, '_blank', 'width=600,height=400');
+//}
 // Function to open a new window linking to zoneminder mjpeg feed
 function openNewWindow(id) {
 index = camera.findIndex(obj => obj["Id"] === id);
@@ -398,57 +416,48 @@ index = camera.findIndex(obj => obj["Id"] === id);
 	window.open(url, '_blank', 'width=600,height=400');
 }
 // Functions to save and retrieve layouts to cookies
-function saveLayoutToCookie() {
-	// Create an object to represent the layout state
-	var layoutState = {};
-	// Iterate through buttons and store their values in the object
-	var buttons = document.getElementsByClassName('myButton');
-	for (var i = 0; i < buttons.length; i++) {
-		layoutState[buttons[i].id] = buttons[i].value;
+function saveToCookie() {
+	// Create a copy of the 'camera' variable to avoid modifying the original array
+	var cameraCopy = JSON.parse(JSON.stringify(camera));
+
+	// Clear the 'Source' property for each camera in the copy
+	cameraCopy.forEach(function(cameraItem) {
+	cameraItem.Source = "";
+	});
+	// add scale and size to the cameraCopy cookie variable
+	cameraCopy.push({"Size": size, "Scale": scale});
+	// Convert the modified array to JSON and save it to a cookie
+	var cameraJSON = JSON.stringify(cameraCopy);
+	var expirationDate = new Date();
+	expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+	document.cookie = "cameraData=" + cameraJSON + "; expires=" + expirationDate.toUTCString() + "; path=/";
+	alert("Display saved");
+}
+function getFromCookie() {
+	var name = "cameraData=";
+	var decodedCookie = decodeURIComponent(document.cookie);
+	var cookieArray = decodedCookie.split(';');
+	for (var i = 0; i < cookieArray.length; i++) {
+		var cookie = cookieArray[i];
+		while (cookie.charAt(0) == ' ') {
+			cookie = cookie.substring(1);
+		}
+		if (cookie.indexOf(name) == 0) {
+			var cameraJSON = cookie.substring(name.length, cookie.length);
+			camera = JSON.parse(cameraJSON);
+			var sizescale = camera[camera.length - 1];
+			size = sizescale["Size"];
+			resizeGrid();
+			scale = sizescale["Scale"];
+			scaleimg();
+			camera.pop(); // remove scale and size from camera variable
+			createButton();
+			createGrid();
+			return JSON.parse(cameraJSON);
+		}
 	}
-	// Convert the object to a JSON string
-	var layoutStateString = JSON.stringify(layoutState);
-	// Save the layout state string as a cookie
-	document.cookie = 'layoutState=' + encodeURIComponent(layoutStateString);
+	return null;	
 }
-function retrieveLayoutFromCookie() {
-	// Get the layout state string from the cookie
-	var cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)layoutState\s*=\s*([^;]*).*$)|^.*$/, "$1");
-
-	// If the cookie exists, parse the JSON string
-	if (cookieValue) {
-		var layoutState = JSON.parse(decodeURIComponent(cookieValue));
-
-		// Update button values based on the retrieved layout state
-		for (var buttonId in layoutState) {
-			var button = document.getElementById(buttonId);
-			console.log(button);
-			console.log(button.value);
-			if (button) {
-				button.value = layoutState[buttonId];
-			}
-        	}
-	}
-}
-function sizeofVariable(myVariable) {
-// Convert the variable to a JSON string
-let jsonString = JSON.stringify(myVariable);
-
-// Log the size of the variable in bytes
-console.log(`Size of myVariable: ${getBytes(jsonString)} bytes`);
-
-// Function to calculate the size of a string in bytes
-function getBytes(string) {
-  return new Blob([string]).size;
-}
-
-}
-
-
-
-
 </script>
 </body>
 </html>
-
-
