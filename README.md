@@ -36,6 +36,10 @@ Zoneminder camera montage displays streams at 1 fps. No limits on number of came
 
 The montage can show/hide cameras  by clicking the buttons and also be reodered by dragging the buttons.
 
+There are also options for scaling images (reduce network bandwidth) and saving layout (not shown on screenshot)
+
+Note: the saved layout opens on page load.
+
 Installation:
 
 Copy file zm_streams_0a.php to webserver HTML folder (e.g. /var/www/html/)
