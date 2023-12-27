@@ -46,7 +46,9 @@ Copy file zm_streams_0a.php to webserver HTML folder (e.g. /var/www/html/)
 
 Ensure proper permissions (e.g. www-data)
 
-Edit line 5 zoneminder loging credentials user and pass: $token_json = shell_exec('curl -k -XPOST -d "user=admin&pass=password" https://localhost/zm/api/host/login.json');
+Edit line 5 zoneminder loging credentials user and pass: 
+
+$token_json = shell_exec('curl -k -XPOST -d "user=admin&pass=password" https://localhost/zm/api/host/login.json');
 
 Ensure the file /etc/zm.conf is readable by the web server (e.g. owner or group: www-data, r)
 
