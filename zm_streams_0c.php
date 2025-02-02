@@ -156,7 +156,7 @@ function Load_Camera()
 	<div id="buttonLayout"></div>
 		<button id="minus" class="myButton" onclick="resizeGrid('minus')">-</button><button id="size" class="myButton">Size:400</button><button id="plus" class="myButton" onclick="resizeGrid('plus')">+</button>
 		<button id="scaledown" class="myButton" onclick="scaleimg('scaledown')">-</button><button id="scalenum" class="myButton">Scale:50%</button><button id="scaleup" class="myButton" onclick="scaleimg('scaleup')">+</button>
-		<button id="save" class="myButton" onclick="saveToCookie()">save</button><button id="load" class="myButton" onclick="getFromCookie()">load</button>
+		<button id="save" class="myButton" onclick="saveToCookie()">save</button><button id="load" class="myButton" onclick="getFromCookie()">load</button><button id="reset" class="myButton" onclick="deleteCookie()">Reset</button>
 	<div id="buttonContainer"></div>
 	<!-- Container to hold the camera images -->
 	<div class="picture-grid" id="pictureGrid"></div>
@@ -212,9 +212,9 @@ function toggleButtonState(buttonId) {
 }
 function resizeGrid(action) {
 	if (action == 'plus') {
-		size=size+100;
+		size=size+50;
 	} else if (action == 'minus' && size > 100) {
-		size=size-100;
+		size=size-50;
 	}
 	const gridContainer = document.getElementById('pictureGrid');
 	const buttonSize = document.getElementById('size');
@@ -306,12 +306,14 @@ function createButton() {
 				return;
 			}
 			if (dragSrcEl !== this) {
-			// Save the target element's class before swapping
-				dragSrcEl.innerHTML = this.innerHTML;
-				this.innerHTML = e.dataTransfer.getData("text/html");
-				const dragSrcId = dragSrcEl.id;
-				dragSrcEl.id = this.id;
-				this.id = dragSrcId;
+			 // Get the parent container
+        const buttonContainer = this.parentNode;
+
+        // Insert the dragged element before the drop target
+        buttonContainer.insertBefore(dragSrcEl, this);
+
+        // Update the order in the grid and camera array
+        reorderGrid();
 			}
 			return false;
 		}
@@ -457,6 +459,11 @@ function getFromCookie() {
 		}
 	}
 	return null;	
+}
+function deleteCookie() {
+	var name = "cameraData=";
+	document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	location.reload(); // Reload the page
 }
 </script>
 </body>
